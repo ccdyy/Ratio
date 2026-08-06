@@ -34,6 +34,17 @@ var viewTabs = doc.getElementById('viewTabs');
   viewTabs.appendChild(btn);
 });
 
+// 预置：结果 tab（未提前还款 / 提前还款）
+var resultTabs = doc.getElementById('resultTabs');
+[['base', '未提前还款'], ['prepay', '提前还款']].forEach(function (t) {
+  var btn = D.makeEl('button', { 'data-result-tab': t[0] });
+  btn.className = 'v-tab';
+  btn.classList.add('v-tab');
+  btn.textContent = t[1];
+  if (t[0] === 'base') btn.classList.add('active');
+  resultTabs.appendChild(btn);
+});
+
 // 预置输入框初始值（模拟 index.html 中的 value 属性）
 function preset(id, value) {
   doc.getElementById(id)._value = String(value);
@@ -41,6 +52,10 @@ function preset(id, value) {
 preset('gjjAmount', 600000);
 preset('comAmount', 400000);
 preset('termMonths', 360);
+
+// 预置面板初始显隐（模拟 index.html 中 pane-prepay 的 hidden 属性）
+doc.getElementById('pane-prepay').hidden = true;
+doc.getElementById('pane-base').hidden = false;
 
 // ── 加载应用 ─────────────────────────────────────────────────
 load('js/calc.js');
@@ -56,19 +71,9 @@ function firstRowTds(tbody) {
   return tr.children.filter(function (c) { return c.tagName === 'td'; });
 }
 
-function collectText(el) {
-  var t = el.textContent || '';
-  for (var i = 0; i < el.children.length; i++) t += collectText(el.children[i]);
-  return t;
-}
-
-function summaryText() {
-  return collectText(doc.getElementById('summary'));
-}
-
 /** 结构化断言：按标签 k 精确取汇总卡片的值文本（避免子串误匹配） */
-function summaryCard(k) {
-  var items = doc.getElementById('summary').querySelectorAll('.sum-item');
+function summaryCard(k, containerId) {
+  var items = doc.getElementById(containerId || 'summaryBase').querySelectorAll('.sum-item');
   for (var i = 0; i < items.length; i++) {
     var kEl = items[i].querySelector('.k');
     if (kEl && kEl.textContent === k) {
@@ -94,10 +99,21 @@ function setRepayMethod(radioEl) {
 
 // ── 1. 默认渲染（公积金 60万 / 360期 / 等额本息 / 3 段利率）──
 check('初始行数 360', D.countRows(tbodyBase) === 360);
-var st = summaryText();
 check('汇总含总贷款金额', summaryCard('总贷款金额') !== null);
 check('汇总含 600,000.00', (function () { var v = summaryCard('总贷款金额'); return v !== null && v.indexOf('600,000.00') >= 0; })());
-check('无提前还贷时表格2隐藏', doc.getElementById('prepayCard').hidden === true);
+check('无提前还贷时提前还款面板隐藏', doc.getElementById('pane-prepay').hidden === true);
+check('初始显示未提前还款面板', doc.getElementById('pane-base').hidden === false);
+check('初始 base tab 激活', D.find(doc.getElementById('resultTabs'), '[data-result-tab="base"]').classList.contains('active'));
+
+// ── 1b. 无提前还贷时「提前还款」tab 显示引导空态 ────────────
+resultTabs.dispatch('click', D.find(resultTabs, '[data-result-tab="prepay"]'));
+check('无提前还贷时表格2显示引导空态', (function () {
+  var trs = tbodyWith.querySelectorAll('tr');
+  if (trs.length !== 1) return false;
+  var tds = trs[0].children.filter(function (c) { return c.tagName === 'td'; });
+  return tds.length === 1 && tds[0].textContent.indexOf('尚未设置提前还贷') >= 0;
+})());
+resultTabs.dispatch('click', D.find(resultTabs, '[data-result-tab="base"]'));
 
 // 首行与直接调用 calc 一致
 var exp = RatioCalc.schedule({
@@ -117,9 +133,22 @@ check('末行本金剩余=0', (function () {
   return ltds[5].textContent === '0.00';
 })());
 
-// ── 2. 添加提前还贷 → 表格 2 出现 ────────────────────────────
+// ── 2. 添加提前还贷 → 切到「提前还款」tab 后表格 2 出现 ──────
 doc.getElementById('addPrepay').dispatch('click');
-check('有提前还贷时表格2显示', doc.getElementById('prepayCard').hidden === false);
+// 初始仍在「未提前还款」tab
+check('添加后仍显示未提前还款面板', doc.getElementById('pane-base').hidden === false);
+check('添加后提前还款面板仍隐藏', doc.getElementById('pane-prepay').hidden === true);
+// 切换到「提前还款」tab
+var prepayTabBtn = D.find(resultTabs, '[data-result-tab="prepay"]');
+resultTabs.dispatch('click', prepayTabBtn);
+check('切换后提前还款面板显示', doc.getElementById('pane-prepay').hidden === false);
+check('切换后未提前还款面板隐藏', doc.getElementById('pane-base').hidden === true);
+check('提前还款 tab 激活', prepayTabBtn.classList.contains('active'));
+// 提前还款面板汇总有数值（非 '—'）
+check('提前还款汇总有总还款额', (function () {
+  var v = summaryCard('提前还贷后 · 总还款额', 'summaryPrepay');
+  return v !== null && v.indexOf('—') < 0;
+})());
 check('表格2行数 360（reduce 期限不变）', D.countRows(tbodyWith) === 360);
 check('提前还贷行高亮标记', (function () {
   var trs = tbodyWith.querySelectorAll('tr');
@@ -134,6 +163,10 @@ check('提前还贷月为第13期', (function () {
   var trs = tbodyWith.querySelectorAll('tr');
   return trs[12] && trs[12].classList.contains('hl-row');
 })());
+// 切回「未提前还款」tab
+resultTabs.dispatch('click', D.find(resultTabs, '[data-result-tab="base"]'));
+check('切回后未提前还款面板显示', doc.getElementById('pane-base').hidden === false);
+check('切回后提前还款面板隐藏', doc.getElementById('pane-prepay').hidden === true);
 // 非混合模式：ppart 选择隐藏
 var firstPrepay = doc.getElementById('prepayList').querySelector('.prepay-row');
 check('非混合时部分选择隐藏', firstPrepay.querySelector('.ppart').hidden === true);
@@ -175,7 +208,7 @@ check('混合行数 360', D.countRows(tbodyBase) === 360);
   });
   var expectTotal = RatioCalc.combine([gPlan, cPlan]).total.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   var vBase = summaryCard('未提前还贷 · 总还款额');
-  var vWith = summaryCard('提前还贷后 · 总还款额');
+  var vWith = summaryCard('提前还贷后 · 总还款额', 'summaryPrepay');
   check('混合总还款额卡片显示数值', vBase !== null && vBase.indexOf(expectTotal) >= 0);
   check('混合总还款额卡片无 —', vBase !== null && vWith !== null && vBase.indexOf('—') < 0 && vWith.indexOf('—') < 0);
 })();
@@ -221,7 +254,7 @@ check('缩短期限后表格2末行清零', (function () {
   var ltds = last.children.filter(function (c) { return c.tagName === 'td'; });
   return ltds[5].textContent === '0.00';
 })());
-check('缩短期限后汇总显示实际期数', summaryText().indexOf('期') >= 0);
+check('缩短期限后汇总显示实际期数', summaryCard('提前还贷后 · 实际期数', 'summaryPrepay') !== null);
 
 // ── 7. 删除利率区间至只剩一个仍可删除保护 ────────────────────
 var delBtns = doc.getElementById('gjjRates').querySelectorAll('.btn-del');

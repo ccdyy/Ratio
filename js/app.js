@@ -7,8 +7,8 @@
 (function () {
   var $ = function (id) { return document.getElementById(id); };
 
-  var YEAR_MIN = 2000;
-  var YEAR_MAX = 2060;
+  var YEAR_MIN = 1990;
+  var YEAR_MAX = 2100;
   var MONTH_NAMES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
 
   // 当前视图：total（合计）/ gjj（公积金）/ com（商业）
@@ -207,35 +207,9 @@
     return mode === 'commercial' ? pc : pl;
   }
 
-  /* ─────────────── 渲染：汇总 ─────────────── */
+  /* ─────────────── 渲染：汇总（按 tab 分组） ─────────────── */
 
-  function renderSummary(inp, basePlan, withPlan, hasPrepay) {
-    var el = $('summary');
-    var totalAmount = (inp.mode === 'mixed') ? inp.gjj.amount + inp.com.amount
-      : (inp.mode === 'commercial' ? inp.com.amount : inp.gjj.amount);
-
-    var cards = [];
-    cards.push({ k: '总贷款金额', v: fmtMoney(totalAmount), cls: '', unit: '元' });
-    cards.push({ k: '未提前还贷 · 总利息', v: fmtMoney(basePlan ? basePlan.totalInterest : 0), cls: '', unit: '元' });
-    cards.push({ k: '未提前还贷 · 总还款额', v: fmtMoney(basePlan ? basePlan.total : 0), cls: '', unit: '元' });
-
-    if (hasPrepay && withPlan) {
-      cards.push({ k: '提前还贷后 · 总利息', v: fmtMoney(withPlan.totalInterest), cls: 'green', unit: '元' });
-      cards.push({ k: '提前还贷后 · 总还款额', v: fmtMoney(withPlan.total), cls: 'green', unit: '元' });
-      cards.push({
-        k: '提前还贷后 · 实际期数', v: withPlan.usedTerms, cls: 'accent', unit: '期'
-      });
-      cards.push({
-        k: '节省利息', v: fmtMoney(Math.max(0, basePlan.totalInterest - withPlan.totalInterest)),
-        cls: 'red', unit: '元'
-      });
-    } else {
-      cards.push({ k: '提前还贷后 · 总利息', v: '—', cls: '', unit: '' });
-      cards.push({ k: '提前还贷后 · 总还款额', v: '—', cls: '', unit: '' });
-      cards.push({ k: '提前还贷后 · 实际期数', v: hasPrepay ? '—' : inp.term + ' 期', cls: 'accent', unit: '' });
-      cards.push({ k: '节省利息', v: '0.00', cls: '', unit: '元' });
-    }
-
+  function renderSummaryCards(el, cards) {
     el.innerHTML = '';
     cards.forEach(function (c) {
       var d = document.createElement('div');
@@ -246,13 +220,49 @@
     });
   }
 
+  function totalAmountOf(inp) {
+    return (inp.mode === 'mixed') ? inp.gjj.amount + inp.com.amount
+      : (inp.mode === 'commercial' ? inp.com.amount : inp.gjj.amount);
+  }
+
+  // Tab「未提前还款」：总金额 / 总还款额 / 总利息 / 期限
+  function renderSummaryBase(inp, basePlan) {
+    var cards = [];
+    cards.push({ k: '总贷款金额', v: fmtMoney(totalAmountOf(inp)), cls: '', unit: '元' });
+    cards.push({ k: '未提前还贷 · 总还款额', v: fmtMoney(basePlan ? basePlan.total : 0), cls: '', unit: '元' });
+    cards.push({ k: '未提前还贷 · 总利息', v: fmtMoney(basePlan ? basePlan.totalInterest : 0), cls: '', unit: '元' });
+    cards.push({ k: '贷款期限', v: inp.term + ' 期', cls: 'accent', unit: '' });
+    renderSummaryCards($('summaryBase'), cards);
+  }
+
+  // Tab「提前还款」：总金额 / 提前还贷后还款额 / 利息 / 实际期数 / 节省
+  function renderSummaryPrepay(inp, basePlan, withPlan, hasPrepay) {
+    var cards = [];
+    cards.push({ k: '总贷款金额', v: fmtMoney(totalAmountOf(inp)), cls: '', unit: '元' });
+    if (hasPrepay && withPlan) {
+      cards.push({ k: '提前还贷后 · 总还款额', v: fmtMoney(withPlan.total), cls: 'green', unit: '元' });
+      cards.push({ k: '提前还贷后 · 总利息', v: fmtMoney(withPlan.totalInterest), cls: 'green', unit: '元' });
+      cards.push({ k: '提前还贷后 · 实际期数', v: withPlan.usedTerms, cls: 'accent', unit: '期' });
+      cards.push({
+        k: '节省利息', v: fmtMoney(Math.max(0, basePlan.totalInterest - withPlan.totalInterest)),
+        cls: 'red', unit: '元'
+      });
+    } else {
+      cards.push({ k: '提前还贷后 · 总还款额', v: '—', cls: '', unit: '' });
+      cards.push({ k: '提前还贷后 · 总利息', v: '—', cls: '', unit: '' });
+      cards.push({ k: '提前还贷后 · 实际期数', v: '—', cls: '', unit: '' });
+      cards.push({ k: '节省利息', v: '—', cls: '', unit: '' });
+    }
+    renderSummaryCards($('summaryPrepay'), cards);
+  }
+
   /* ─────────────── 渲染：表格 ─────────────── */
 
-  function renderTable(tbody, plan, prepayMonths) {
+  function renderTable(tbody, plan, prepayMonths, emptyText) {
     tbody.innerHTML = '';
     if (!plan || !plan.rows.length) {
       var tr = document.createElement('tr');
-      tr.innerHTML = '<td colspan="7" class="empty-tip">暂无数据 — 请检查左侧设置（贷款金额、期限等）</td>';
+      tr.innerHTML = '<td colspan="7" class="empty-tip">' + (emptyText || '暂无数据 — 请检查左侧设置（贷款金额、期限等）') + '</td>';
       tbody.appendChild(tr);
       return;
     }
@@ -307,19 +317,16 @@
     var view = inp.mode === 'mixed' ? state.view : 'total';
     state.view = view;
 
-    renderSummary(inp, basePlan, withPlan, hasPrepay);
+    renderSummaryBase(inp, basePlan);
+    renderSummaryPrepay(inp, basePlan, withPlan, hasPrepay);
 
     // 表格 1：未提前还贷
     renderTable($('tbodyBase'), rowsForView(inp, false, view), null);
 
-    // 表格 2：提前还贷后
-    var prepayCard = $('prepayCard');
-    if (hasPrepay) {
-      prepayCard.hidden = false;
-      renderTable($('tbodyWith'), rowsForView(inp, true, view), prepayMonthsFor(view));
-    } else {
-      prepayCard.hidden = true;
-    }
+    // 表格 2：提前还贷后（无提前还贷时显示引导空态）
+    renderTable($('tbodyWith'), hasPrepay ? rowsForView(inp, true, view) : null,
+      prepayMonthsFor(view),
+      '尚未设置提前还贷 — 在左侧「提前还贷」中添加后，可在此查看还贷后的每月还款对比');
 
     // 视图切换按钮
     $('viewTabs').hidden = inp.mode !== 'mixed';
@@ -363,6 +370,22 @@
       if (!btn) return;
       state.view = btn.getAttribute('data-view');
       refresh();
+    });
+
+    // 结果 tab 切换（未提前还款 / 提前还款）
+    $('resultTabs').addEventListener('click', function (e) {
+      var btn = e.target.closest ? e.target.closest('.v-tab') : null;
+      if (!btn) return;
+      var tab = btn.getAttribute('data-result-tab');
+      $('pane-base').hidden = tab !== 'base';
+      $('pane-prepay').hidden = tab !== 'prepay';
+      var tabs = $('resultTabs').querySelectorAll('.v-tab');
+      for (var i = 0; i < tabs.length; i++) {
+        tabs[i].classList.toggle('active', tabs[i] === btn);
+        if (tabs[i].setAttribute) {
+          tabs[i].setAttribute('aria-selected', tabs[i] === btn ? 'true' : 'false');
+        }
+      }
     });
 
     // 删除动态行（委托）
