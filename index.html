@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ratio — 贷款利率计算器</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand">
+    <span class="logo">R</span>
+    <h1>Ratio<span class="brand-sub">贷款利率计算器</span></h1>
+  </div>
+  <p class="tagline">支持等额本金 / 等额本息 · 分段利率 · 公积金 / 商业 / 混合贷款 · 多次提前还贷</p>
+</header>
+
+<main class="layout">
+
+  <!-- ══════════ 设置面板 ══════════ -->
+  <aside class="panel" id="settings">
+
+    <section class="card">
+      <h2>贷款方式</h2>
+      <div class="radio-row" id="loanMode">
+        <label><input type="radio" name="loanMode" value="gjj" checked> 纯公积金贷款</label>
+        <label><input type="radio" name="loanMode" value="commercial"> 纯商业贷款</label>
+        <label><input type="radio" name="loanMode" value="mixed"> 混合贷款</label>
+      </div>
+    </section>
+
+    <!-- 公积金部分 -->
+    <section class="card part-card" id="gjjCard">
+      <h2>公积金贷款</h2>
+      <div class="field">
+        <label for="gjjAmount">贷款金额（元）</label>
+        <input type="number" id="gjjAmount" value="600000" min="0" step="1000">
+      </div>
+      <div class="field">
+        <label>分段利率（年利率 %，按开始日期生效）</label>
+        <div class="rate-list" id="gjjRates"></div>
+        <button type="button" class="btn-add" data-add-rates="gjj">＋ 添加利率区间</button>
+      </div>
+    </section>
+
+    <!-- 商业部分 -->
+    <section class="card part-card" id="comCard">
+      <h2>商业贷款</h2>
+      <div class="field">
+        <label for="comAmount">贷款金额（元）</label>
+        <input type="number" id="comAmount" value="400000" min="0" step="1000">
+      </div>
+      <div class="field">
+        <label>分段利率（年利率 %，按开始日期生效）</label>
+        <div class="rate-list" id="comRates"></div>
+        <button type="button" class="btn-add" data-add-rates="com">＋ 添加利率区间</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>贷款期限与开始时间</h2>
+      <div class="field">
+        <label for="termMonths">总贷款时间（月）</label>
+        <input type="number" id="termMonths" value="360" min="1" max="1200">
+      </div>
+      <div class="field">
+        <label>开始还贷时间</label>
+        <div class="ym-picker">
+          <select id="startYear"></select><span class="unit">年</span>
+          <select id="startMonth"></select><span class="unit">月</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>还款方式</h2>
+      <div class="radio-row" id="repayMethod">
+        <label><input type="radio" name="repayMethod" value="principal"> 等额本金</label>
+        <label><input type="radio" name="repayMethod" value="installment" checked> 等额本息</label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>提前还贷</h2>
+      <p class="hint">提前还贷发生在对应月份的常规还款之后，可设置多笔。</p>
+      <div id="prepayList"></div>
+      <button type="button" class="btn-add" id="addPrepay">＋ 添加提前还贷</button>
+    </section>
+
+  </aside>
+
+  <!-- ══════════ 结果区 ══════════ -->
+  <section class="results">
+
+    <div class="summary" id="summary"></div>
+
+    <div class="view-tabs" id="viewTabs" hidden>
+      <button type="button" class="tab active" data-view="total">合计</button>
+      <button type="button" class="tab" data-view="gjj">公积金</button>
+      <button type="button" class="tab" data-view="com">商业</button>
+    </div>
+
+    <div class="table-card">
+      <h2>每月还款计划（未提前还贷）</h2>
+      <div class="table-wrap">
+        <table class="plan-table">
+          <thead>
+            <tr>
+              <th>期数</th><th>还款日期</th><th class="num">月还款本金</th><th class="num">月还款利息</th>
+              <th class="num">月还款总额</th><th class="num">总本金剩余</th><th class="num">总利息剩余</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyBase"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="table-card" id="prepayCard" hidden>
+      <h2>提前还贷后的每月还款计划</h2>
+      <div class="table-wrap">
+        <table class="plan-table">
+          <thead>
+            <tr>
+              <th>期数</th><th>还款日期</th><th class="num">月还款本金</th><th class="num">月还款利息</th>
+              <th class="num">月还款总额</th><th class="num">总本金剩余</th><th class="num">总利息剩余</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyWith"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<footer class="app-footer">Ratio · 纯 HTML / CSS / 原生 JavaScript 实现，所有计算均在本地完成。</footer>
+
+<script src="js/calc.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
