@@ -1,0 +1,29 @@
+{
+  "name": "ratio-obsidian",
+  "version": "1.0.0",
+  "description": "Ratio 中国房贷计算器 Obsidian 插件",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node tools/bundle.mjs",
+    "build": "node tools/bundle.mjs",
+    "build:esbuild": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "test": "node tests/run-tests.mjs"
+  },
+  "keywords": [
+    "obsidian",
+    "plugin",
+    "mortgage",
+    "calculator",
+    "房贷计算器"
+  ],
+  "author": "Ratio",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "builtin-modules": "^3.3.0",
+    "esbuild": "^0.21.5",
+    "obsidian": "^1.5.7",
+    "tslib": "^2.6.2",
+    "typescript": "^5.4.5"
+  }
+}

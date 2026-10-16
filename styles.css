@@ -1,0 +1,1185 @@
+/* ==========================================================================
+   Ratio 中国房贷计算器 — Obsidian 原生风格 UI 样式
+   遵循 Obsidian CSS 变量规范，完美融合浅色/深色主题、主编辑区、侧边栏与嵌入块
+   ========================================================================== */
+
+.ratio-view-container {
+  padding: 0 !important;
+  overflow-y: auto;
+  height: 100%;
+  background: var(--background-primary, #f8fafc);
+}
+
+.ratio-plugin-root {
+  /* 全面对接 Obsidian 原生色彩与设计 Token，同时内置网页版(Web)默认回退值 */
+  --r-bg: var(--background-primary, #f8fafc);
+  --r-card-bg: var(--background-secondary, #ffffff);
+  --r-elevated-bg: var(--background-primary, #ffffff);
+  --r-border: var(--background-modifier-border, #e2e8f0);
+  --r-border-hover: var(--background-modifier-border-hover, #cbd5e1);
+  --r-hover-bg: var(--background-modifier-hover, rgba(15, 23, 42, 0.05));
+  --r-text: var(--text-normal, #0f172a);
+  --r-text-muted: var(--text-muted, #475569);
+  --r-text-faint: var(--text-faint, #94a3b8);
+  --r-accent: var(--interactive-accent, #2563eb);
+  --r-accent-hover: var(--interactive-accent-hover, #1d4ed8);
+  --r-accent-text: var(--text-on-accent, #ffffff);
+
+  /* 语义色（本金绿 / 利息橙红 / 提前还款琥珀高亮） */
+  --r-green: #10b981;
+  --r-green-soft: rgba(16, 185, 129, 0.12);
+  --r-red: #ef4444;
+  --r-red-soft: rgba(239, 68, 68, 0.12);
+  --r-amber: #f59e0b;
+  --r-amber-soft: rgba(245, 158, 11, 0.14);
+  --r-blue: #3b82f6;
+
+  --r-radius-lg: 10px;
+  --r-radius-md: 7px;
+  --r-radius-sm: 5px;
+  --r-mono: var(--font-monospace, "SF Mono", "JetBrains Mono", "Menlo", "Consolas", monospace);
+
+  font-family: var(--font-interface, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif);
+  background: var(--r-bg);
+  color: var(--r-text);
+  line-height: 1.45;
+  font-size: 13px;
+  min-height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.theme-dark .ratio-plugin-root {
+  --r-bg: var(--background-primary, #0f172a);
+  --r-card-bg: var(--background-secondary, #1e293b);
+  --r-elevated-bg: var(--background-primary, #0f172a);
+  --r-border: var(--background-modifier-border, #334155);
+  --r-border-hover: var(--background-modifier-border-hover, #475569);
+  --r-hover-bg: var(--background-modifier-hover, rgba(255, 255, 255, 0.06));
+  --r-text: var(--text-normal, #f1f5f9);
+  --r-text-muted: var(--text-muted, #94a3b8);
+  --r-text-faint: var(--text-faint, #64748b);
+  --r-accent: var(--interactive-accent, #3b82f6);
+  --r-accent-hover: var(--interactive-accent-hover, #2563eb);
+  --r-accent-text: var(--text-on-accent, #ffffff);
+
+  --r-green: #34d399;
+  --r-green-soft: rgba(52, 211, 153, 0.16);
+  --r-red: #f87171;
+  --r-red-soft: rgba(248, 113, 113, 0.16);
+  --r-amber: #fbbf24;
+  --r-amber-soft: rgba(251, 191, 36, 0.18);
+  --r-blue: #60a5fa;
+}
+
+.ratio-plugin-root *,
+.ratio-plugin-root *::before,
+.ratio-plugin-root *::after {
+  box-sizing: border-box;
+}
+
+.ratio-plugin-root [hidden] {
+  display: none !important;
+}
+
+/* ==========================================================================
+   1. 顶部原生感工具栏 (Toolbar)
+   ========================================================================== */
+.ratio-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  padding: 12px 20px;
+  background: var(--r-card-bg);
+  border-bottom: 1px solid var(--r-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.ratio-toolbar-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.ratio-brand-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: var(--r-accent);
+  color: var(--r-accent-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.ratio-title-group {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  min-width: 0;
+}
+
+.ratio-title-main {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--r-text);
+  white-space: nowrap;
+}
+
+.ratio-title-sub {
+  font-size: 12px;
+  color: var(--r-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ratio-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* 按钮体系（覆盖 Obsidian 默认 button 样式冲突） */
+.ratio-plugin-root .ratio-btn {
+  appearance: none;
+  border: 1px solid var(--r-border) !important;
+  background: var(--r-elevated-bg) !important;
+  color: var(--r-text) !important;
+  border-radius: var(--r-radius-md) !important;
+  padding: 5px 12px !important;
+  height: 30px !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  box-shadow: none !important;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.ratio-plugin-root .ratio-btn:hover {
+  background: var(--r-hover-bg) !important;
+  border-color: var(--r-border-hover) !important;
+}
+
+.ratio-plugin-root .ratio-btn-primary {
+  background: var(--r-accent) !important;
+  color: var(--r-accent-text) !important;
+  border-color: transparent !important;
+  font-weight: 600 !important;
+}
+
+.ratio-plugin-root .ratio-btn-primary:hover {
+  background: var(--r-accent-hover) !important;
+}
+
+.ratio-plugin-root .ratio-btn-ghost {
+  background: transparent !important;
+  color: var(--r-text-muted) !important;
+}
+
+.ratio-plugin-root .ratio-btn-ghost:hover {
+  color: var(--r-text) !important;
+  background: var(--r-hover-bg) !important;
+}
+
+/* ==========================================================================
+   2. 主工作区双栏网格 (Workspace Layout)
+   ========================================================================== */
+.ratio-workspace {
+  display: grid;
+  grid-template-columns: 380px minmax(0, 1fr);
+  gap: 18px;
+  padding: 18px 20px 28px;
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.ratio-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.ratio-main {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* ==========================================================================
+   3. 左侧配置卡片与分段控制器 (Settings & Segmented Controls)
+   ========================================================================== */
+.ratio-section {
+  background: var(--r-card-bg);
+  border: 1px solid var(--r-border);
+  border-radius: var(--r-radius-lg);
+  padding: 14px 16px;
+}
+
+.ratio-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--r-border);
+}
+
+.ratio-section-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--r-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.ratio-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.ratio-dot-gjj {
+  background: var(--r-green);
+}
+
+.ratio-dot-com {
+  background: var(--r-blue);
+}
+
+.ratio-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--r-elevated-bg);
+  border: 1px solid var(--r-border);
+  color: var(--r-text-muted);
+}
+
+.ratio-form-group {
+  margin-bottom: 11px;
+}
+
+.ratio-form-group:last-child {
+  margin-bottom: 0;
+}
+
+.ratio-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.ratio-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--r-text-muted);
+  margin-bottom: 5px;
+}
+
+.ratio-label-row .ratio-label {
+  margin-bottom: 0;
+}
+
+/* 现代分段控制器（替代传统生硬 radio） */
+.ratio-seg-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+  gap: 3px;
+  background: var(--r-elevated-bg);
+  border: 1px solid var(--r-border);
+  border-radius: var(--r-radius-md);
+  padding: 3px;
+}
+
+.ratio-seg-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 0;
+  user-select: none;
+}
+
+.ratio-seg-item input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.ratio-seg-item span {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 5px 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--r-text-muted);
+  border-radius: var(--r-radius-sm);
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.ratio-seg-item:hover span {
+  color: var(--r-text);
+}
+
+.ratio-seg-item input[type="radio"]:checked + span {
+  background: var(--r-accent);
+  color: var(--r-accent-text);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+/* 表单两列行与后缀输入框 */
+.ratio-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.ratio-form-row .ratio-form-group {
+  margin-bottom: 0;
+}
+
+.ratio-input-affix,
+.ratio-select-affix {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: var(--r-elevated-bg);
+  border: 1px solid var(--r-border);
+  border-radius: var(--r-radius-md);
+  height: 32px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  overflow: hidden;
+}
+
+.ratio-input-affix:focus-within,
+.ratio-select-affix:focus-within {
+  border-color: var(--r-accent);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.16);
+}
+
+.ratio-input-affix input[type="number"] {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--r-text) !important;
+  font-size: 13px !important;
+  font-variant-numeric: tabular-nums;
+  padding: 0 8px !important;
+  height: 100% !important;
+  width: 100% !important;
+  min-width: 0;
+  outline: none !important;
+}
+
+.ratio-select-affix select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--r-text) !important;
+  font-size: 12.5px !important;
+  font-variant-numeric: tabular-nums;
+  padding: 0 4px 0 8px !important;
+  height: 100% !important;
+  width: 100% !important;
+  min-width: 0;
+  outline: none !important;
+  cursor: pointer;
+}
+
+.ratio-suffix {
+  font-size: 11.5px;
+  color: var(--r-text-faint);
+  padding: 0 8px 0 2px;
+  white-space: nowrap;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.ratio-ym-inline {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 6px;
+}
+
+/* 快捷期限胶囊按钮 */
+.ratio-term-presets {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding-top: 2px;
+}
+
+.ratio-preset-lbl {
+  font-size: 11.5px;
+  color: var(--r-text-faint);
+}
+
+.ratio-plugin-root .ratio-chip {
+  appearance: none;
+  border: 1px solid var(--r-border) !important;
+  background: var(--r-elevated-bg) !important;
+  color: var(--r-text-muted) !important;
+  border-radius: 999px !important;
+  padding: 2px 9px !important;
+  height: 22px !important;
+  font-size: 11px !important;
+  cursor: pointer;
+  box-shadow: none !important;
+  transition: all 0.15s ease;
+}
+
+.ratio-plugin-root .ratio-chip:hover {
+  border-color: var(--r-accent) !important;
+  color: var(--r-text) !important;
+}
+
+.ratio-plugin-root .ratio-chip.active {
+  background: var(--r-accent) !important;
+  color: var(--r-accent-text) !important;
+  border-color: transparent !important;
+  font-weight: 600 !important;
+}
+
+/* ==========================================================================
+   4. 动态列表（分段利率 & 提前还贷卡片）
+   ========================================================================== */
+.ratio-rate-list,
+.ratio-prepay-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 9px;
+}
+
+/* 分段利率行：左年月 + 中利率% + 右删除 */
+.ratio-rate-row {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr 26px;
+  gap: 6px;
+  align-items: center;
+  background: var(--r-elevated-bg);
+  border: 1px solid var(--r-border);
+  border-radius: var(--r-radius-md);
+  padding: 5px 6px;
+}
+
+.ratio-rate-ym {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ratio-rate-row .ratio-input-affix,
+.ratio-rate-row .ratio-select-affix {
+  height: 28px;
+}
+
+/* 提前还贷双行结构化卡片（彻底解决单行挤压截断） */
+.ratio-prepay-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--r-elevated-bg);
+  border: 1px solid var(--r-border);
+  border-radius: var(--r-radius-md);
+  padding: 8px;
+}
+
+.ratio-prepay-top {
+  display: grid;
+  grid-template-columns: 1.35fr 1.15fr 26px;
+  gap: 6px;
+  align-items: center;
+}
+
+.ratio-prepay-ym {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ratio-prepay-top .ratio-input-affix,
+.ratio-prepay-top .ratio-select-affix {
+  height: 28px;
+}
+
+.ratio-prepay-bottom {
+  display: flex;
+  gap: 6px;
+}
+
+.ratio-prepay-bottom select {
+  flex: 1;
+  min-width: 0;
+  height: 28px !important;
+  padding: 0 8px !important;
+  font-size: 12px !important;
+  border: 1px solid var(--r-border) !important;
+  border-radius: var(--r-radius-md) !important;
+  background: var(--r-card-bg) !important;
+  color: var(--r-text) !important;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+
+.ratio-prepay-bottom select.ppart {
+  flex: 0 0 92px;
+}
+
+.ratio-hint {
+  font-size: 11.5px;
+  color: var(--r-text-faint);
+  margin: 0 0 8px 0 !important;
+}
+
+/* 删除按钮与虚线添加按钮 */
+.ratio-plugin-root .btn-del {
+  appearance: none;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--r-text-faint) !important;
+  width: 26px !important;
+  height: 26px !important;
+  padding: 0 !important;
+  border-radius: var(--r-radius-sm) !important;
+  font-size: 13px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.ratio-plugin-root .btn-del:hover {
+  background: var(--r-red-soft) !important;
+  color: var(--r-red) !important;
+}
+
+.ratio-plugin-root .ratio-btn-dashed {
+  appearance: none;
+  width: 100%;
+  height: 32px !important;
+  padding: 0 12px !important;
+  border: 1px dashed var(--r-border-hover) !important;
+  border-radius: var(--r-radius-md) !important;
+  background: transparent !important;
+  color: var(--r-text-muted) !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  cursor: pointer;
+  box-shadow: none !important;
+  transition: all 0.15s ease;
+}
+
+.ratio-plugin-root .ratio-btn-dashed:hover {
+  border-color: var(--r-accent) !important;
+  color: var(--r-accent) !important;
+  background: var(--r-hover-bg) !important;
+}
+
+/* 公积金历史利率参考面板与链接按钮 */
+.ratio-plugin-root .ratio-link-btn {
+  appearance: none;
+  border: 1px solid var(--r-border) !important;
+  background: var(--r-elevated-bg) !important;
+  color: var(--r-accent) !important;
+  border-radius: 999px !important;
+  padding: 2px 10px !important;
+  height: 24px !important;
+  font-size: 11.5px !important;
+  font-weight: 500 !important;
+  cursor: pointer;
+  box-shadow: none !important;
+  transition: all 0.15s ease;
+}
+
+.ratio-plugin-root .ratio-link-btn:hover,
+.ratio-plugin-root .ratio-link-btn.active {
+  background: var(--r-accent) !important;
+  color: var(--r-accent-text) !important;
+  border-color: transparent !important;
+}
+
+.ratio-history-box {
+  margin-top: 10px;
+  padding: 10px;
+  background: var(--r-elevated-bg);
+  border: 1px solid var(--r-border);
+  border-radius: var(--r-radius-md);
+}
+
+.ratio-history-head {
+  margin-bottom: 8px;
+}
+
+.ratio-history-title {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--r-text);
+}
+
+.ratio-history-presets {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.ratio-history-table-wrap {
+  max-height: 220px;
+  overflow: auto;
+  border: 1px solid var(--r-border);
+  border-radius: var(--r-radius-sm);
+}
+
+.ratio-plugin-root table.ratio-history-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin: 0 !important;
+  font-size: 11.5px !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.ratio-plugin-root table.ratio-history-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--r-card-bg) !important;
+  color: var(--r-text-muted) !important;
+  font-weight: 600 !important;
+  font-size: 11px !important;
+  padding: 6px 6px !important;
+  border: none !important;
+  border-bottom: 1px solid var(--r-border) !important;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.ratio-plugin-root table.ratio-history-table th.num,
+.ratio-plugin-root table.ratio-history-table td.num {
+  text-align: right !important;
+}
+
+.ratio-plugin-root table.ratio-history-table td {
+  padding: 5px 6px !important;
+  border: none !important;
+  border-bottom: 1px solid var(--r-border) !important;
+  background: var(--r-elevated-bg);
+  vertical-align: middle;
+}
+
+.ratio-plugin-root table.ratio-history-table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+.ratio-plugin-root table.ratio-history-table td.col-date {
+  white-space: nowrap;
+}
+
+.ratio-history-table .hist-date {
+  display: block;
+  font-family: var(--r-mono);
+  font-weight: 600;
+  color: var(--r-text);
+  font-size: 11.5px;
+}
+
+.ratio-history-table .hist-note {
+  display: block;
+  font-size: 10.5px;
+  color: var(--r-text-faint);
+  max-width: 115px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ratio-plugin-root .ratio-hist-rate-btn {
+  appearance: none;
+  border: 1px solid var(--r-border) !important;
+  background: var(--r-card-bg) !important;
+  color: var(--r-text) !important;
+  font-family: var(--r-mono) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  padding: 2px 5px !important;
+  height: 21px !important;
+  border-radius: 4px !important;
+  cursor: pointer;
+  box-shadow: none !important;
+  transition: all 0.12s ease;
+}
+
+.ratio-plugin-root .ratio-hist-rate-btn:hover {
+  background: var(--r-green) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+.ratio-history-note {
+  margin: 7px 0 0 0 !important;
+  font-size: 11px;
+  color: var(--r-text-muted);
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   5. 右侧结果导航栏与指标卡片 (Result Tabs & Summary Cards)
+   ========================================================================== */
+.ratio-result-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ratio-mode-tabs {
+  display: inline-flex;
+  background: var(--r-card-bg);
+  border: 1px solid var(--r-border);
+  border-radius: var(--r-radius-lg);
+  padding: 4px;
+  gap: 4px;
+  flex: 1;
+  min-width: 260px;
+}
+
+.ratio-plugin-root .ratio-mode-tab {
+  flex: 1;
+  appearance: none;
+  border: none !important;
+  background: transparent !important;
+  color: var(--r-text-muted) !important;
+  border-radius: var(--r-radius-md) !important;
+  padding: 7px 14px !important;
+  height: 34px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  box-shadow: none !important;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.ratio-plugin-root .ratio-mode-tab:hover {
+  color: var(--r-text) !important;
+  background: var(--r-hover-bg) !important;
+}
+
+.ratio-plugin-root .ratio-mode-tab.active {
+  background: var(--r-accent) !important;
+  color: var(--r-accent-text) !important;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.22) !important;
+}
+
+.ratio-plugin-root .ratio-mode-tab.active[data-result-tab="prepay"] {
+  background: var(--r-green) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.24) !important;
+}
+
+.ratio-tab-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ratio-ind-base {
+  background: var(--r-blue);
+}
+
+.ratio-ind-prepay {
+  background: var(--r-green);
+}
+
+.ratio-plugin-root .ratio-mode-tab.active .ratio-tab-indicator {
+  background: #ffffff !important;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.28);
+}
+
+/* 混合贷子视图切换（合计 / 公积金 / 商贷） */
+.ratio-view-tabs {
+  display: inline-flex;
+  background: var(--r-card-bg);
+  border: 1px solid var(--r-border);
+  border-radius: var(--r-radius-lg);
+  padding: 4px;
+  gap: 3px;
+}
+
+.ratio-plugin-root .ratio-view-tabs .ratio-tab {
+  appearance: none;
+  border: none !important;
+  background: transparent !important;
+  color: var(--r-text-muted) !important;
+  border-radius: var(--r-radius-md) !important;
+  padding: 5px 12px !important;
+  height: 30px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  cursor: pointer;
+  box-shadow: none !important;
+}
+
+.ratio-plugin-root .ratio-view-tabs .ratio-tab.active {
+  background: var(--r-accent) !important;
+  color: var(--r-accent-text) !important;
+  font-weight: 600 !important;
+}
+
+/* 汇总指标卡片网格 */
+.ratio-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.ratio-sum-item {
+  background: var(--r-card-bg);
+  border: 1px solid var(--r-border);
+  border-radius: var(--r-radius-lg);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.ratio-sum-item .k {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--r-text-muted);
+  margin-bottom: 5px;
+}
+
+.ratio-sum-item .v {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--r-text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.ratio-sum-item .v small {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--r-text-muted);
+  margin-left: 3px;
+}
+
+.ratio-sum-item .s {
+  font-size: 11px;
+  color: var(--r-text-faint);
+  margin-top: 5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ratio-sum-item.accent .v {
+  color: var(--r-blue);
+}
+
+.ratio-sum-item.green .v {
+  color: var(--r-green);
+}
+
+.ratio-sum-item.warn .v {
+  color: var(--r-amber);
+}
+
+.ratio-sum-item.red {
+  border-color: rgba(16, 185, 129, 0.35);
+  background: var(--r-green-soft);
+}
+
+.ratio-sum-item.red .v {
+  color: var(--r-green);
+}
+
+/* ==========================================================================
+   6. 数据表格区 (Plan Table — 阻止 Obsidian Markdown Table 样式污染)
+   ========================================================================== */
+.ratio-table-section {
+  background: var(--r-card-bg);
+  border: 1px solid var(--r-border);
+  border-radius: var(--r-radius-lg);
+  overflow: hidden;
+}
+
+.ratio-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--r-border);
+}
+
+.ratio-table-header h3 {
+  margin: 0 !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  color: var(--r-text) !important;
+}
+
+.ratio-table-sub {
+  font-size: 11.5px;
+  color: var(--r-text-faint);
+}
+
+.ratio-table-scroll {
+  max-height: 580px;
+  overflow: auto;
+}
+
+.ratio-plugin-root table.ratio-plan-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  border: none !important;
+  margin: 0 !important;
+  font-size: 12.5px !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.ratio-plugin-root table.ratio-plan-table thead tr {
+  background: var(--r-card-bg) !important;
+}
+
+.ratio-plugin-root table.ratio-plan-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--r-card-bg) !important;
+  color: var(--r-text-muted) !important;
+  font-weight: 600 !important;
+  font-size: 11.5px !important;
+  text-align: left;
+  padding: 9px 12px !important;
+  border: none !important;
+  border-bottom: 1px solid var(--r-border) !important;
+  white-space: nowrap;
+}
+
+.ratio-plugin-root table.ratio-plan-table td {
+  padding: 7px 12px !important;
+  border: none !important;
+  border-bottom: 1px solid var(--r-border) !important;
+  color: var(--r-text) !important;
+  white-space: nowrap;
+  background: var(--r-elevated-bg);
+}
+
+.ratio-plugin-root table.ratio-plan-table tbody tr:hover td {
+  background: var(--r-hover-bg) !important;
+}
+
+.ratio-plugin-root table.ratio-plan-table th.num,
+.ratio-plugin-root table.ratio-plan-table td.num {
+  text-align: right !important;
+  font-family: var(--r-mono);
+}
+
+.ratio-plugin-root table.ratio-plan-table td.col-idx {
+  color: var(--r-text-muted) !important;
+  font-family: var(--r-mono);
+}
+
+.ratio-plugin-root table.ratio-plan-table td.principal-col {
+  color: var(--r-green) !important;
+}
+
+.ratio-plugin-root table.ratio-plan-table td.interest-col {
+  color: var(--r-red) !important;
+}
+
+.ratio-plugin-root table.ratio-plan-table td.total-col {
+  font-weight: 600 !important;
+}
+
+.ratio-plugin-root table.ratio-plan-table td.remain {
+  color: var(--r-text-muted) !important;
+}
+
+.ratio-plugin-root table.ratio-plan-table tr.hl-row td {
+  background: var(--r-amber-soft) !important;
+}
+
+.ratio-plugin-root table.ratio-plan-table .prepay-flag {
+  color: var(--r-amber);
+  font-weight: 700;
+}
+
+.ratio-plugin-root table.ratio-plan-table td.empty-tip {
+  padding: 32px 16px !important;
+  text-align: center !important;
+  color: var(--r-text-muted) !important;
+  font-size: 12.5px !important;
+  white-space: normal !important;
+}
+
+/* ==========================================================================
+   7. 代码块嵌入与窄屏/侧边栏自适应 (ResizeObserver 驱动)
+   ========================================================================== */
+.ratio-codeblock-host {
+  border: 1px solid var(--background-modifier-border, #e2e8f0);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 12px 0;
+}
+
+.ratio-plugin-root.ratio-compact .ratio-toolbar {
+  position: static;
+}
+
+/* 当容器宽度 < 880px（如分屏、侧边栏、笔记内嵌）自动切换为上下单列流式布局 */
+.ratio-plugin-root.ratio-is-narrow .ratio-workspace {
+  grid-template-columns: 1fr;
+  padding: 14px;
+  gap: 14px;
+}
+
+.ratio-plugin-root.ratio-is-narrow .ratio-title-sub {
+  display: none;
+}
+
+/* 当容器宽度 < 520px（如左右侧边栏）进一步收紧间距 */
+.ratio-plugin-root.ratio-is-xs .ratio-toolbar {
+  padding: 10px 12px;
+}
+
+.ratio-plugin-root.ratio-is-xs .ratio-workspace {
+  padding: 10px;
+}
+
+.ratio-plugin-root.ratio-is-xs .ratio-form-row {
+  grid-template-columns: 1fr;
+}
+
+.ratio-plugin-root.ratio-is-xs .ratio-summary-grid {
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 900px) {
+  .ratio-workspace {
+    grid-template-columns: 1fr;
+    padding: 14px;
+  }
+  .ratio-title-sub {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   8. 独立网页版 (index.html) 宿主容器与 Toast 样式
+   ========================================================================== */
+body.ratio-web-body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc;
+  color: #0f172a;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+body.ratio-web-body.theme-dark {
+  background: #0f172a;
+  color: #f1f5f9;
+}
+
+#ratio-app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.ratio-web-footer {
+  text-align: center;
+  padding: 14px 20px 22px;
+  font-size: 12px;
+  color: #64748b;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+body.ratio-web-body.theme-dark .ratio-web-footer {
+  color: #94a3b8;
+  border-top-color: rgba(148, 163, 184, 0.15);
+}
+
+.ratio-web-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.ratio-web-toast {
+  background: #1e293b;
+  color: #f8fafc;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 16px;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.ratio-web-toast-hide {
+  opacity: 0;
+  transform: translateY(8px);
+}

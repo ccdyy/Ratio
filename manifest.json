@@ -1,0 +1,10 @@
+{
+  "id": "ratio-mortgage-calculator",
+  "name": "Ratio 中国房贷计算器",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "中国房贷利率计算器：支持等额本金/等额本息、纯公积金/纯商业/混合贷款、分段利率与多次提前还贷（减少月供/缩短期限），支持独立面板、代码块嵌入与导出 Markdown。",
+  "author": "Ratio",
+  "authorUrl": "",
+  "isDesktopOnly": false
+}
